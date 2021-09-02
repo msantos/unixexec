@@ -257,6 +257,7 @@ static noreturn void usage(void) {
   errx(EXIT_FAILURE,
        "[OPTION] <SOCKETPATH> <COMMAND> <...>\n"
        "version: %s\n"
+       "-U, --no-unlink           do not unlink the socket before binding\n"
        "-v, --verbose             write additional messages to stderr\n"
        "-h, --help                usage summary",
        UNIXEXEC_VERSION);

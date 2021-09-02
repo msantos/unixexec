@@ -36,19 +36,25 @@ An echo server allowing 3 concurrent connections:
     └── echo3
         └── run
 
-``` service/echo1/run
+* service/echo1/run
+
+``` sh
 #!/bin/sh
 
 exec unixsock /tmp/echo1.socket cat
 ```
 
-``` service/echo2/run
+* service/echo2/run
+
+``` sh
 #!/bin/sh
 
 exec unixsock /tmp/echo2.socket cat
 ```
 
-``` service/echo3/run
+* service/echo3/run
+
+``` sh
 #!/bin/sh
 
 exec unixsock /tmp/echo3.socket cat
@@ -66,6 +72,9 @@ Then run:
     ./musl-make
 
 # OPTIONS
+
+-U, --no-unlink
+: do not unlink the socket before binding
 
 -v, --verbose
 : write additional messages to stderr
