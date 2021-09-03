@@ -41,7 +41,6 @@ static int unixexec_unlink(const unixexec_state_t *up, const char *path);
 static int setlocalenv(const char *path);
 static int setremoteenv(int fd);
 static int setenvuint(const char *key, u_int64_t val);
-static int setenvint(const char *key, int64_t val);
 static noreturn void usage(void);
 
 int main(int argc, char *argv[]) {
@@ -181,7 +180,7 @@ static int setlocalenv(const char *path) {
   if (setenvuint("UNIXLOCALGID", getgid()) == -1)
     return -1;
 
-  if (setenvint("UNIXLOCALPID", getpid()) == -1)
+  if (setenvuint("UNIXLOCALPID", (unsigned)getpid()) == -1)
     return -1;
 
   return 0;
@@ -208,7 +207,7 @@ static int setremoteenv(int fd) {
   if (getsockopt(fd, SOL_SOCKET, SO_PEERCRED, &peer, &peerlen) == -1)
     return -1;
 
-  if (setenvint("UNIXREMOTEPID", peer.pid) == -1)
+  if (setenvuint("UNIXREMOTEPID", (unsigned)peer.pid) == -1)
     return -1;
 #elif defined(__FreeBSD__)
   if (getpeereid(fd, &peer.uid, &peer.gid) == -1)
@@ -236,17 +235,6 @@ static int setenvuint(const char *key, u_int64_t val) {
   int rv;
 
   rv = snprintf(buf, sizeof(buf), "%lu", val);
-  if (rv < 0 || (unsigned)rv > sizeof(buf))
-    return -1;
-
-  return setenv(key, buf, 1);
-}
-
-static int setenvint(const char *key, int64_t val) {
-  char buf[21];
-  int rv;
-
-  rv = snprintf(buf, sizeof(buf), "%ld", val);
   if (rv < 0 || (unsigned)rv > sizeof(buf))
     return -1;
 
