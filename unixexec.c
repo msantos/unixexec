@@ -33,7 +33,8 @@ static const struct option long_options[] = {
     {"no-unlink", no_argument, NULL, 'U'},
     {"verbose", no_argument, NULL, 'v'},
     {"help", no_argument, NULL, 'h'},
-    {NULL, 0, NULL, 0}};
+    {NULL, 0, NULL, 0},
+};
 
 static int unixexec_listen(const unixexec_state_t *up, const char *path,
                            size_t pathlen);
@@ -78,20 +79,20 @@ int main(int argc, char *argv[]) {
   path = argv[0];
 
   lfd = unixexec_listen(&up, path, strlen(path));
-  if (lfd < 0)
+  if (lfd == -1)
     err(111, "listen: %s", path);
 
   fd = accept(lfd, (struct sockaddr *)&sa, &salen);
-  if (fd < 0)
+  if (fd == -1)
     err(111, "accept");
 
-  if (setlocalenv(path) < 0)
+  if (setlocalenv(path) == -1)
     err(111, "setlocalenv");
 
-  if (setremoteenv(fd) < 0)
+  if (setremoteenv(fd) == -1)
     err(111, "setremoteenv");
 
-  if ((dup2(fd, STDOUT_FILENO) < 0) || (dup2(fd, STDIN_FILENO) < 0))
+  if ((dup2(fd, STDOUT_FILENO) == -1) || (dup2(fd, STDIN_FILENO) == -1))
     err(111, "dup2");
 
   (void)execvp(argv[1], argv + 1);
@@ -112,7 +113,7 @@ static int unixexec_listen(const unixexec_state_t *up, const char *path,
 
   fd = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
 
-  if (fd < 0)
+  if (fd == -1)
     return -1;
 
   sa.sun_family = AF_UNIX;
@@ -120,10 +121,10 @@ static int unixexec_listen(const unixexec_state_t *up, const char *path,
   (void)memcpy(sa.sun_path, path, pathlen);
   salen = SUN_LEN(&sa);
 
-  if (unixexec_unlink(up, path) < 0)
+  if (unixexec_unlink(up, path) == -1)
     return -1;
 
-  if (bind(fd, (struct sockaddr *)&sa, salen) < 0)
+  if (bind(fd, (struct sockaddr *)&sa, salen) == -1)
     return -1;
 
   if (listen(fd, 1) == -1) {
@@ -142,11 +143,8 @@ static int unixexec_unlink(const unixexec_state_t *up, const char *path) {
   if (!up->unlink)
     return 0;
 
-  if (stat(path, &sb) == -1) {
-    if (errno == ENOENT)
-      return 0;
-    return -1;
-  }
+  if (stat(path, &sb) == -1)
+    return (errno == ENOENT) ? 0 : -1;
 
   if ((sb.st_mode & S_IFMT) != S_IFSOCK) {
     errno = ENOTSOCK;
