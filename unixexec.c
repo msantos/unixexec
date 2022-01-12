@@ -32,7 +32,7 @@
 
 #include <pwd.h>
 
-#define UNIXEXEC_VERSION "0.1.0"
+#define UNIXEXEC_VERSION "0.2.0"
 
 #ifndef UNIX_PATH_MAX
 #define UNIX_PATH_MAX (sizeof(((struct sockaddr_un *)0)->sun_path))
@@ -219,8 +219,10 @@ static int setremoteenv(int fd) {
   if (getsockopt(fd, SOL_SOCKET, SO_PEERCRED, &peer, &peerlen) == -1)
     return -1;
 
-  if (setenvuint("UNIXREMOTEPID", (unsigned)peer.pid) == -1)
-    return -1;
+  if (peer.pid > 0) {
+    if (setenvuint("UNIXREMOTEPID", (unsigned)peer.pid) == -1)
+      return -1;
+  }
 #elif defined(__FreeBSD__)
   if (getpeereid(fd, &peer.uid, &peer.gid) == -1)
     return -1;
