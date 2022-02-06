@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
   if (lfd == -1)
     err(111, "listen: %s", path);
 
-  fd = accept(lfd, (struct sockaddr *)&sa, &salen);
+  fd = accept4(lfd, (struct sockaddr *)&sa, &salen, SOCK_CLOEXEC);
   if (fd == -1)
     err(111, "accept");
 
