@@ -1,4 +1,4 @@
-/* Copyright (c) 2021-2022, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2021-2023, Michael Santos <michael.santos@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -32,7 +32,7 @@
 
 #include <pwd.h>
 
-#define UNIXEXEC_VERSION "0.2.0"
+#define UNIXEXEC_VERSION "0.2.1"
 
 #ifndef UNIX_PATH_MAX
 #define UNIX_PATH_MAX (sizeof(((struct sockaddr_un *)0)->sun_path))
@@ -56,7 +56,7 @@ static int unixexec_unlink(const unixexec_state_t *up, const char *path);
 static int setlocalenv(const char *path);
 static int setremoteenv(int fd);
 static int setenvuint(const char *key, u_int64_t val);
-static noreturn void usage(void);
+static void usage(void);
 
 int main(int argc, char *argv[]) {
   unixexec_state_t up = {0};
@@ -80,6 +80,7 @@ int main(int argc, char *argv[]) {
     case 'h':
     default:
       usage();
+      exit(2);
     }
   }
 
@@ -88,6 +89,7 @@ int main(int argc, char *argv[]) {
 
   if (argc < 2) {
     usage();
+    exit(2);
   }
 
   path = argv[0];
@@ -111,7 +113,7 @@ int main(int argc, char *argv[]) {
 
   (void)execvp(argv[1], argv + 1);
 
-  err(127, "execvp");
+  err(errno == ENOENT ? 127 : 126, "%s", argv[1]);
 }
 
 static int unixexec_listen(const unixexec_state_t *up, const char *path,
@@ -255,12 +257,13 @@ static int setenvuint(const char *key, u_int64_t val) {
   return setenv(key, buf, 1);
 }
 
-static noreturn void usage(void) {
-  errx(EXIT_FAILURE,
-       "[OPTION] <SOCKETPATH> <COMMAND> <...>\n"
-       "version: %s\n"
-       "-U, --no-unlink           do not unlink the socket before binding\n"
-       "-v, --verbose             write additional messages to stderr\n"
-       "-h, --help                usage summary",
-       UNIXEXEC_VERSION);
+static void usage(void) {
+  (void)fprintf(
+      stderr,
+      "[OPTION] <SOCKETPATH> <COMMAND> <...>\n"
+      "version: %s\n"
+      "-U, --no-unlink           do not unlink the socket before binding\n"
+      "-v, --verbose             write additional messages to stderr\n"
+      "-h, --help                usage summary\n",
+      UNIXEXEC_VERSION);
 }
