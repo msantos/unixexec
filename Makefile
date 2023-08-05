@@ -9,7 +9,7 @@ CFLAGS ?= -D_FORTIFY_SOURCE=2 -O2 -fstack-protector-strong \
           -fno-strict-aliasing
 LDFLAGS += -Wl,-z,relro,-z,now
 
-UNIXEXEC_CFLAGS ?= -g -Wall -fwrapv
+UNIXEXEC_CFLAGS ?= -g -Wall -Wextra -fwrapv
 
 CFLAGS += $(UNIXEXEC_CFLAGS)
 LDFLAGS += $(UNIXEXEC_LDFLAGS)
