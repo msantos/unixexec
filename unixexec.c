@@ -38,6 +38,8 @@
 #define UNIX_PATH_MAX (sizeof(((struct sockaddr_un *)0)->sun_path))
 #endif
 
+extern char *__progname;
+
 typedef struct {
   int verbose;
   int unlink;
@@ -260,10 +262,10 @@ static int setenvuint(const char *key, u_int64_t val) {
 static void usage(void) {
   (void)fprintf(
       stderr,
-      "[OPTION] <SOCKETPATH> <COMMAND> <...>\n"
+      "%s [OPTION] <SOCKETPATH> <COMMAND> <...>\n"
       "version: %s\n"
       "-U, --no-unlink           do not unlink the socket before binding\n"
       "-v, --verbose             write additional messages to stderr\n"
       "-h, --help                usage summary\n",
-      UNIXEXEC_VERSION);
+      __progname, UNIXEXEC_VERSION);
 }

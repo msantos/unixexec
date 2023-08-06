@@ -28,17 +28,19 @@ $ nc -U /tmp/sock
 
 An echo server allowing 3 concurrent connections:
 
-    service/
-    ├── echo1
-    │   └── run
-    ├── echo2
-    │   └── run
-    └── echo3
-        └── run
+```
+service/
+├── echo1
+│   └── run
+├── echo2
+│   └── run
+└── echo3
+    └── run
+```
 
 * service/echo1/run
 
-``` sh
+```sh
 #!/bin/sh
 
 exec unixsock /tmp/echo1.socket cat
@@ -46,7 +48,7 @@ exec unixsock /tmp/echo1.socket cat
 
 * service/echo2/run
 
-``` sh
+```sh
 #!/bin/sh
 
 exec unixsock /tmp/echo2.socket cat
@@ -54,7 +56,7 @@ exec unixsock /tmp/echo2.socket cat
 
 * service/echo3/run
 
-``` sh
+```sh
 #!/bin/sh
 
 exec unixsock /tmp/echo3.socket cat
@@ -62,14 +64,18 @@ exec unixsock /tmp/echo3.socket cat
 
 Then run:
 
-    svscan service
+```
+svscan service
+```
 
 # Build
 
-    make
+```
+make
 
-    #### static executable using musl
-    ./musl-make
+#### static executable using musl
+./musl-make
+```
 
 # OPTIONS
 
