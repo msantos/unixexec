@@ -13,7 +13,6 @@ case "${MACHTYPE}" in
   *) ;;
 esac
 
-export LSNEXEC_CFLAGS="-no-pie"
 export LSNEXEC_LDFLAGS="-I$MUSL_INCLUDE/kernel-headers/generic/include -I$MUSL_INCLUDE/kernel-headers/${MACHTYPE}/include"
 export CC="musl-gcc -static -Os"
 make $@
